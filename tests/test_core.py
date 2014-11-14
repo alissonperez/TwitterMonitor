@@ -3,6 +3,7 @@
 from twitter_monitor.core import Notifier, Routine
 from mock import MagicMock, Mock
 import unittest
+import datetime
 
 
 def create_twitter_api_mock():
@@ -57,8 +58,10 @@ def create_notifier_mock():
 
 class RoutineTest(Routine):
 
-    name = "Routine Test"
-    short_name = "Rout. Test"
+    name = u"Routine Test"
+    short_name = u"Rout. Test"
+
+    interval = 10    # minutes
 
     def _execute(self):
         self.notify("Test message")
@@ -77,3 +80,26 @@ class RoutineTestCase(unittest.TestCase):
         message = "{}: {}".format(self.routine.short_name, "Test message")
 
         self.notifier.send.assert_called_once_with(message)
+
+    def test_last_execution(self):
+        self.routine.run()
+
+        last_execution = self.routine.last_execution
+        self.assertIsInstance(last_execution, datetime.datetime)
+
+        # Microsecond and second can be different.
+        now = datetime.datetime.now()
+        now = now.replace(
+            microsecond=last_execution.microsecond,
+            second=last_execution.second)
+
+        self.assertEquals(now, last_execution)
+
+    def test_clear_last_execution(self):
+        self.routine.run()
+
+        last_execution = self.routine.last_execution
+        self.assertIsInstance(last_execution, datetime.datetime)
+
+        self.routine.clear_last_execution()
+        self.assertIsNone(self.routine.last_execution)
