@@ -29,6 +29,9 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Topic :: Database",
-    ]
+    ],
+    install_requires=[
+        "tweepy>=2.3",
+    ],
     # @todo - Include: "description" and "long_description"
 )

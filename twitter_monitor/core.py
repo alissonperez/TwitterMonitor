@@ -162,7 +162,7 @@ class Routine(loggable):
                 "Exception - Method '_set_last_execution': " + e.message)
 
     def _get_last_execution_file_path(self):
-        name = "twitter-monitor-{} {} {}".format(
+        name = u"twitter-monitor-{} {} {}".format(
             self.__class__.__name__, self.name, self.short_name)
 
         name = util.slugfy(name)[0:75]
@@ -176,10 +176,10 @@ class Routine(loggable):
             self.logger.debug("Empty message")
             return
 
-        new_message = "{}: {}".format(
+        new_message = u"{}: {}".format(
             self.short_name, message)
 
         self.notifier.send(new_message)
 
     def __str__(self):
-        return "Routine '{}'".format(self.name)
+        return u"Routine '{}'".format(self.name)

@@ -1,9 +1,11 @@
 # -*- coding: UTF-8 -*-
 
+from core import loggable
 
-class runner(loggable):
+
+class Executor(loggable):
     """
-    Responsável por executar as rotinas
+    Responsable to run routines
     """
 
     def __init__(self, notifier, routines):
@@ -11,8 +13,18 @@ class runner(loggable):
         self.routines = routines
 
     def run(self):
+        success = True
+
         for class_ref in self.routines:
             rt = class_ref(self.notifier)
-            self.logger.info("Executando \"{}\"".format(str(rt)))
+            self.logger.info(u"Running \"{}\"".format(unicode(rt)))
+
             rt.logger = self.logger
-            rt.run()
+
+            if not rt.run():
+                self.logger.error(u"Error on running routine \"{}\"".format(unicode(rt)))
+                success = False
+
+            self.logger.info(u"Finished \"{}\"".format(unicode(rt)))
+
+        return success
