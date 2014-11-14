@@ -3,6 +3,9 @@
 from abc import ABCMeta
 from abc import abstractmethod
 import logging
+import util
+import datetime
+import tempfile
 
 
 class loggable(object):
@@ -68,9 +71,11 @@ class Routine(loggable):
 
     __metaclass__ = ABCMeta
 
-    name = None            # Routine full name
+    name = None  # Routine full name
 
-    short_name = None      # Routine short name (it'll be used in message)
+    short_name = None  # Routine short name (it'll be used in message)
+
+    _file_last_execution = None  # Cache of last execution file content
 
     def __init__(self, notifier):
         self.notifier = notifier
@@ -82,11 +87,87 @@ class Routine(loggable):
             self.short_name = self.__class__.__name__
 
     def run(self):
-        return self._execute()
+        """
+        Run this routine
+        """
+
+        if self._execute():
+            self._set_last_execution()
+            return True
+
+        return False
 
     @abstractmethod
     def _execute(self):
+        """
+        Put your code here in your subclasses.
+        Must be implemented by subclasses.
+        """
+
         return NotImplemented
+
+    def clear_last_execution(self):
+        """
+        Clear last execution time of this routine
+        """
+
+        self._set_last_execution("")
+
+    @property
+    def last_execution(self):
+        """
+        Returns a datetime object with last execution of routine
+        """
+
+        self.logger.debug("Finding last execution time")
+
+        try:
+            if self._file_last_execution is None:
+                filepath = self._get_last_execution_file_path()
+                self.logger.debug("Opening file: " + filepath)
+
+                with open(filepath) as f:
+                    self._file_last_execution = f.read()
+                    self.logger.debug(
+                        "File content: " + self._file_last_execution)
+
+            if self._file_last_execution is None:
+                self._file_last_execution = ""
+
+            return datetime.datetime.strptime(
+                self._file_last_execution, "%Y-%m-%d %H:%M:%S.%f")
+        except Exception, e:
+            self.logger.debug(
+                "Exception - Method/property 'last_execution': " + e.message)
+
+        return None
+
+    def _set_last_execution(self, val=None):
+        now_str = datetime.datetime.now().isoformat(" ")
+        now_str = now_str if val is None else val
+
+        self.logger.debug("Setting last execution file content to: " + now_str)
+
+        # Cleaning cache attribute
+        self._file_last_execution = None
+
+        try:
+            filepath = self._get_last_execution_file_path()
+            self.logger.debug("Opening and truncating file: " + filepath)
+
+            with open(filepath, "wt") as f:
+                f.write(now_str)
+        except Exception, e:
+            self.logger.debug(
+                "Exception - Method '_set_last_execution': " + e.message)
+
+    def _get_last_execution_file_path(self):
+        name = "twitter-monitor-{} {} {}".format(
+            self.__class__.__name__, self.name, self.short_name)
+
+        name = util.slugfy(name)[0:75]
+
+        return "{}/{}".format(tempfile.gettempdir(), name)
 
     def notify(self, message):
         message = str(message)
