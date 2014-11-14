@@ -63,7 +63,7 @@ class Notifier(loggable):
 
 class Routine(loggable):
     """
-    Representação de uma rotina
+    Routine representation
     """
 
     __metaclass__ = ABCMeta

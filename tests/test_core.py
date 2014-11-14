@@ -9,16 +9,6 @@ def create_twitter_api_mock():
     """
     Create a mocked twitter api to use with tests
     """
-
-    class Api:
-        _followers = []
-
-        def __init__(self, followers):
-            self._followers = followers
-
-        def followers(self):
-            return self._followers
-
     class Follower:
         def __init__(self, screen_name, id):
             self.screen_name = screen_name
