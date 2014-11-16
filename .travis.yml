@@ -5,6 +5,9 @@ python:
 # command to install dependencies
 install:
   - pip install tweepy
+  - pip install coverage
+  - pip install python-coveralls
 
 # command to run tests
-script: python run_tests.py
+script: coverage run run_tests.py
+after_success: coveralls
