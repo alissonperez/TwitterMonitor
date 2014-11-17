@@ -252,7 +252,9 @@ class Routine(common.loggable):
         It returns the routine unique id
         """
         name = u"{} {} {}".format(
-            self.__class__.__name__, self.name, self.short_name)
+            self.__class__.__name__,
+            self.name.encode("ascii", "ignore"),
+            self.short_name.encode("ascii", "ignore"))
 
         m = hashlib.md5()
         m.update(name)
