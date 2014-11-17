@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 
 from twitter_monitor.core import Notifier, Routine
-from mock import MagicMock, Mock
+from mock import MagicMock, Mock, call
 import unittest
 import datetime
+import logging
 
 
 def create_twitter_api_mock():
@@ -61,8 +62,6 @@ class RoutineTest(Routine):
     name = u"Routine Test"
     short_name = u"Rout. Test"
 
-    interval = 10    # minutes
-
     def _execute(self):
         self.notify("Test message")
         return True
@@ -73,13 +72,15 @@ class RoutineTestCase(unittest.TestCase):
     def setUp(self):
         self.notifier = create_notifier_mock()
         self.routine = RoutineTest(self.notifier, {})
+        self.routine.clear_last_execution()
+
+        self.test_message = "{}: {}".format(
+            self.routine.short_name, "Test message")
 
     def test_run(self):
         self.assertTrue(self.routine.run(), "Run method should return true")
 
-        message = "{}: {}".format(self.routine.short_name, "Test message")
-
-        self.notifier.send.assert_called_once_with(message)
+        self.notifier.send.assert_called_once_with(self.test_message)
 
     def test_uid(self):
         self.assertEquals("4229e3f836bc692f6112211fb711abbd", self.routine.uid)
@@ -106,3 +107,17 @@ class RoutineTestCase(unittest.TestCase):
 
         self.routine.clear_last_execution()
         self.assertIsNone(self.routine.last_execution)
+
+    def test_execution_interval(self):
+        self.routine.interval_minutes = 10
+
+        self.routine.run()
+        self.routine.run()
+        self.notifier.send.assert_called_once_with(self.test_message)
+
+    def test_execution_interval_is_none(self):
+        self.routine.run()
+        self.routine.run()
+
+        calls = [call(self.test_message), call(self.test_message)]
+        self.assertEquals(calls, self.notifier.send.call_args_list)

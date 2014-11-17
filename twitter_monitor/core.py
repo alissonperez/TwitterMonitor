@@ -76,6 +76,8 @@ class Routine(loggable):
 
     short_name = None  # Routine short name (it'll be used in message)
 
+    interval_minutes = None  # Interval to execute routine
+
     _file_last_execution = None  # Cache of last execution file content
 
     def __init__(self, notifier, key_value_store={}):
@@ -93,8 +95,27 @@ class Routine(loggable):
         Run this routine
         """
 
+        if self._skip_execution():
+            self.logger.info("Skipping execution")
+            return True
+
         if self._execute():
             self._set_last_execution()
+            return True
+
+        return False
+
+    def _skip_execution(self):
+        if self.interval_minutes is None or self.last_execution is None:
+            return False
+
+        timedelta_compare = datetime.timedelta(minutes=self.interval_minutes)
+
+        diff = datetime.datetime.now() - self.last_execution
+
+        if diff < timedelta_compare:
+            message = ("Interval not reached. Elapsed {} minutes")
+            self.logger.info(message.format(diff.seconds/60))
             return True
 
         return False
@@ -124,12 +145,9 @@ class Routine(loggable):
         self.logger.debug("Finding last execution time")
 
         try:
-            val = None
-
             if self.uid in self.key_value_store:
                 val = self.key_value_store[self.uid]
-
-            return datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S.%f")
+                return datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S.%f")
         except Exception, e:
             self.logger.debug(
                 "Exception - Method/property 'last_execution': " + e.message)
@@ -140,7 +158,8 @@ class Routine(loggable):
         now_str = datetime.datetime.now().isoformat(" ")
         now_str = now_str if val is None else val
 
-        self.logger.debug("Setting last execution file content to: " + now_str)
+        self.logger.debug(
+            "Setting last execution file content to: '{}'".format(now_str))
 
         self.key_value_store[self.uid] = now_str
 
@@ -156,15 +175,6 @@ class Routine(loggable):
         m.update(name)
 
         return m.hexdigest()
-
-    def _get_last_execution_file_path(self):
-        name = u"twitter-monitor-{} {} {}".format(
-            self.__class__.__name__, self.name, self.short_name)
-
-        m = hashlib.md5()
-        m.update(name)
-
-        return "{}/{}".format(tempfile.gettempdir(), m.hexdigest())
 
     def notify(self, message):
         message = str(message)
