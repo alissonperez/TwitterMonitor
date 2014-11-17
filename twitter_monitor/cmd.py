@@ -22,7 +22,8 @@ class Executor(loggable):
             rt.logger = self.logger
 
             if not rt.run():
-                self.logger.error(u"Error on running routine \"{}\"".format(unicode(rt)))
+                self.logger.error(u"Error on running routine \"{}\"".format(
+                    unicode(rt)))
                 success = False
 
             self.logger.info(u"Finished \"{}\"".format(unicode(rt)))

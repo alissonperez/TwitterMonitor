@@ -72,7 +72,7 @@ class RoutineTestCase(unittest.TestCase):
 
     def setUp(self):
         self.notifier = create_notifier_mock()
-        self.routine = RoutineTest(self.notifier)
+        self.routine = RoutineTest(self.notifier, {})
 
     def test_run(self):
         self.assertTrue(self.routine.run(), "Run method should return true")
@@ -80,6 +80,9 @@ class RoutineTestCase(unittest.TestCase):
         message = "{}: {}".format(self.routine.short_name, "Test message")
 
         self.notifier.send.assert_called_once_with(message)
+
+    def test_uid(self):
+        self.assertEquals("4229e3f836bc692f6112211fb711abbd", self.routine.uid)
 
     def test_last_execution(self):
         self.routine.run()

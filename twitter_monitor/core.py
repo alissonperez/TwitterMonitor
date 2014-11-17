@@ -6,6 +6,7 @@ import logging
 import util
 import datetime
 import tempfile
+import hashlib
 
 
 class loggable(object):
@@ -77,8 +78,9 @@ class Routine(loggable):
 
     _file_last_execution = None  # Cache of last execution file content
 
-    def __init__(self, notifier):
+    def __init__(self, notifier, key_value_store={}):
         self.notifier = notifier
+        self.key_value_store = key_value_store
 
         if self.name is None:
             self.name = self.__class__.__name__
@@ -122,20 +124,12 @@ class Routine(loggable):
         self.logger.debug("Finding last execution time")
 
         try:
-            if self._file_last_execution is None:
-                filepath = self._get_last_execution_file_path()
-                self.logger.debug("Opening file: " + filepath)
+            val = None
 
-                with open(filepath) as f:
-                    self._file_last_execution = f.read()
-                    self.logger.debug(
-                        "File content: " + self._file_last_execution)
+            if self.uid in self.key_value_store:
+                val = self.key_value_store[self.uid]
 
-            if self._file_last_execution is None:
-                self._file_last_execution = ""
-
-            return datetime.datetime.strptime(
-                self._file_last_execution, "%Y-%m-%d %H:%M:%S.%f")
+            return datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S.%f")
         except Exception, e:
             self.logger.debug(
                 "Exception - Method/property 'last_execution': " + e.message)
@@ -148,26 +142,29 @@ class Routine(loggable):
 
         self.logger.debug("Setting last execution file content to: " + now_str)
 
-        # Cleaning cache attribute
-        self._file_last_execution = None
+        self.key_value_store[self.uid] = now_str
 
-        try:
-            filepath = self._get_last_execution_file_path()
-            self.logger.debug("Opening and truncating file: " + filepath)
+    @property
+    def uid(self):
+        """
+        It returns the routine unique id
+        """
+        name = u"{} {} {}".format(
+            self.__class__.__name__, self.name, self.short_name)
 
-            with open(filepath, "wt") as f:
-                f.write(now_str)
-        except Exception, e:
-            self.logger.debug(
-                "Exception - Method '_set_last_execution': " + e.message)
+        m = hashlib.md5()
+        m.update(name)
+
+        return m.hexdigest()
 
     def _get_last_execution_file_path(self):
         name = u"twitter-monitor-{} {} {}".format(
             self.__class__.__name__, self.name, self.short_name)
 
-        name = util.slugfy(name)[0:75]
+        m = hashlib.md5()
+        m.update(name)
 
-        return "{}/{}".format(tempfile.gettempdir(), name)
+        return "{}/{}".format(tempfile.gettempdir(), m.hexdigest())
 
     def notify(self, message):
         message = str(message)
