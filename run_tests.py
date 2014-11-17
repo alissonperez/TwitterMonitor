@@ -4,6 +4,7 @@
 import os
 import argparse
 import sys
+import logging
 from unittest import TestLoader
 from unittest import TextTestRunner
 
@@ -43,4 +44,5 @@ class TMTestRunner(object):
         return TestLoader().discover(project_dir)
 
 
+logging.getLogger('').addHandler(logging.NullHandler())
 TMTestRunner().execute()

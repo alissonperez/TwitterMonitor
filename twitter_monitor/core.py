@@ -2,35 +2,118 @@
 
 from abc import ABCMeta
 from abc import abstractmethod
-import logging
-import util
+import common
 import datetime
-import tempfile
 import hashlib
+import logging
+import tweepy
+import anydbm
+import tempfile
+
+# Module logger
+logger = logging.getLogger(__name__)
 
 
-class loggable(object):
+class ExecutorFactory(common.loggable):
     """
-    Include logger property in objects to show log messages
+    Factory to create an executor.
     """
 
-    _logger = None
+    def __init__(self, routines, twitter_keys):
+        self.routines = routines
+        self.twitter_keys = twitter_keys
 
-    @property
-    def logger(self):
-        if self._logger is None:
-            self._logger = logging.getLogger(__name__)
-            self._logger.addHandler(logging.NullHandler())
-            self._logger.setLevel(logging.DEBUG)
+    def create_default(self):
+        self.logger.debug("Creating a default logger")
 
-        return self._logger
+        notifier = self._create_notifier(self._create_twitter_api())
 
-    @logger.setter
-    def logger(self, logger):
-        self._logger = logger
+        executor = Executor(
+            notifier, self.routines, self._create_key_value_store())
+
+        return executor
+
+    def _create_twitter_api(self):
+        self.logger.debug("Creating a twitter api")
+
+        ta = self.twitter_keys
+
+        self.logger.debug("Consumer_key: " + ta["consumer_key"])
+        self.logger.debug("Consumer_secret: " + ta["consumer_secret"])
+        self.logger.debug("Access_token_key: " + ta["access_token_key"])
+        self.logger.debug("Access_token_secret: " + ta["access_token_secret"])
+
+        auth = tweepy.OAuthHandler(
+            ta['consumer_key'], ta['consumer_secret'])
+        auth.set_access_token(
+            ta['access_token_key'], ta['access_token_secret'])
+
+        return tweepy.API(auth)
+
+    def _create_notifier(self, twitter_api):
+        n = Notifier(twitter_api)
+        return n
+
+    def _create_key_value_store(self):
+        try:
+            name = ".twitter-monitor-info"
+            filename = "{}/{}".format(tempfile.gettempdir(), name)
+            return anydbm.open(filename, "c")
+        except Exception, e:
+            pass
+
+        return None
 
 
-class Notifier(loggable):
+class Executor(common.loggable):
+    """
+    Responsable to run routines
+    """
+
+    def __init__(self, notifier, routines, key_value_store={}):
+        self.notifier = notifier
+        self.routines = routines
+        self.key_value_store = key_value_store
+        self._routines_instances = None
+
+    def run(self):
+        success = True
+
+        try:
+            for rt in self.routines_instances():
+                self.logger.info(u"Running \"{}\"".format(unicode(rt)))
+
+                if not rt.run():
+                    self.logger.error(
+                        u"Error on running routine \"{}\"".format(unicode(rt)))
+
+                    success = False
+
+                self.logger.info(u"Finished \"{}\"".format(unicode(rt)))
+        except Exception, e:
+            if (hasattr(self.key_value_store, "close")
+                    and callable(getattr(self.key_value_store, "close"))):
+                    self.key_value_store.close()
+
+            self.logger.error("Error: " + e.message)
+            success = False
+
+        return success
+
+    def routines_instances(self):
+        if self._routines_instances is not None:
+            return self._routines_instances
+
+        self._routines_instances = []
+
+        for class_ref in self.routines:
+            self._routines_instances.append(
+                class_ref(self.notifier, self.key_value_store))
+
+        return self._routines_instances
+
+
+class Notifier(common.loggable):
     """
     It sends a message to destinations (followers) with twitter API.
     """
@@ -65,7 +148,7 @@ class Notifier(loggable):
         return self._followers
 
 
-class Routine(loggable):
+class Routine(common.loggable):
     """
     Routine representation
     """

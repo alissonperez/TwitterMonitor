@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
 
-from twitter_monitor.core import Notifier, Routine
+from twitter_monitor.core import Notifier, Routine, Executor, ExecutorFactory
 from mock import MagicMock, Mock, call
 import unittest
 import datetime
-import logging
 
 
 def create_twitter_api_mock():
     """
     Create a mocked twitter api to use with tests
     """
+
     class Follower:
         def __init__(self, screen_name, id):
             self.screen_name = screen_name
@@ -21,6 +21,17 @@ def create_twitter_api_mock():
     api.followers.return_value = [Follower("alissonperez", 42)]
 
     return api
+
+
+class ExecutorTestCase(unittest.TestCase):
+
+    def test_run(self):
+        notifier = Mock(name="NotifierTest")
+        e = Executor(notifier, [RoutineTest])
+
+        self.assertTrue(e.run())
+
+        notifier.send.assert_called_once_with('Rout. Test: Test message')
 
 
 class NotifierTestCase(unittest.TestCase):
@@ -121,3 +132,21 @@ class RoutineTestCase(unittest.TestCase):
 
         calls = [call(self.test_message), call(self.test_message)]
         self.assertEquals(calls, self.notifier.send.call_args_list)
+
+
+class ExecutorFactoryTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.twitter_api = {
+            "consumer_key": "",
+            "consumer_secret": "",
+            "access_token_key": "",
+            "access_token_secret": "",
+        }
+
+        self.routines = [RoutineTest]
+        self.factory = ExecutorFactory(self.routines, self.twitter_api)
+
+    def test_create_default(self):
+        executor = self.factory.create_default()
+        self.assertIsInstance(executor, Executor)
