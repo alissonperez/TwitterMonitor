@@ -3,9 +3,11 @@ TwitterMonitor
 
 [![Build Status](https://travis-ci.org/alissonperez/TwitterMonitor.svg)](https://travis-ci.org/alissonperez/TwitterMonitor) [![Coverage Status](https://coveralls.io/repos/alissonperez/TwitterMonitor/badge.png?branch=master)](https://coveralls.io/r/alissonperez/TwitterMonitor?branch=master)
 
+TwitterMonitor é uma pequena biblioteca open source para criar rotinas de monitoramento de qualquer natureza usando o envio de mensagens (*direct messages* ou simplesmente *DM*) do *Twitter* (http://twitter.com).
 
-Code Example
-------------
+Para cada solicitação de envio de mensagem a biblioteca obterá **todos** os seguidores da conta configurada e enviará uma DM para cada um de forma automática.
+
+Abaixo segue um exemplo de uma rotina simples (classe **RoutineTest**) que envia a mensagem "A test message" para todos os seguidores da conta configurada no dicionário *twitter_keys* em um intervalo de no mínimo 10 minutos entre cada notificação.
 
 
 ```python
@@ -27,10 +29,10 @@ class RoutineTest(core.Routine):
 
 # Manage your keys and tokens on https://apps.twitter.com/
 twitter_keys = {
-    "consumer_key": "BgDcBAwKpVK7E5KO2fREeLB4i",
-    "consumer_secret": "rtJdiZzD1aqKsdHH3z3GePkFp3ZVTurAYAjn59VWjGAI6QyiGp",
-    "access_token_key": "2806285067-zH2Soc11qR6jObVUwA4KUIYrU7xpwQ0yWkkbFM7",
-    "access_token_secret": "9LLywwkei4SWlkJx5kPvzww2KKaHHztShFxlcVEZ9BNnC",
+    "consumer_key": "AaAaAaAaAaAaAaAaAaAaAaAaA",
+    "consumer_secret": "AaAaAaAaAaAaAaAaAaAaAaAaAAaAaAaAaAaAaAaAaAaAaAaAaA",
+    "access_token_key": "999999999-AaAaAaAaAaAaAaAaAaAaAaAaA",
+    "access_token_secret": "AaAaAaAaAaAaAaAaAaAaAaAaAAaAaAaAaAaAaAaAaAaAaAaAaA",
 }
 
 # A list of routine classes
