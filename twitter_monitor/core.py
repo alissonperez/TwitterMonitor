@@ -19,12 +19,15 @@ class ExecutorFactory(common.loggable):
     Factory to create an executor.
     """
 
-    def __init__(self, routines, twitter_keys):
+    def __init__(self, routines,
+                 twitter_keys, setup_default_logger=True):
         self.routines = routines
         self.twitter_keys = twitter_keys
+        self.setup_default_logger = setup_default_logger
 
     def create_default(self):
-        self.logger.debug("Creating a default logger")
+        self._setup_logger()
+        self.logger.debug("Creating a default Executor")
 
         notifier = self._create_notifier(self._create_twitter_api())
 
@@ -32,6 +35,23 @@ class ExecutorFactory(common.loggable):
             notifier, self.routines, self._create_key_value_store())
 
         return executor
+
+    def _setup_logger(self):
+        """
+        Setup module logger to
+        """
+        if not self.setup_default_logger:
+            return
+
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(message)s')
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+
+        logger = logging.getLogger("twitter_monitor")
+        logger.addHandler(handler)
+        logger.setLevel(logging.DEBUG)
 
     def _create_twitter_api(self):
         self.logger.debug("Creating a twitter api")
@@ -136,6 +156,11 @@ class Notifier(common.loggable):
             return
 
         for follower in self._get_followers():
+            if follower.screen_name != "alissonperez":
+                self.logger.info("Skipping user '{}'".format(
+                    follower.screen_name))
+                continue
+
             self.logger.info("Sending message to \"{}\": \"{}\"".format(
                 follower.screen_name, message))
 

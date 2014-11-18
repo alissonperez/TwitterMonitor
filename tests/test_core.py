@@ -137,7 +137,7 @@ class RoutineTestCase(unittest.TestCase):
 class ExecutorFactoryTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.twitter_api = {
+        self.twitter_keys = {
             "consumer_key": "",
             "consumer_secret": "",
             "access_token_key": "",
@@ -145,7 +145,8 @@ class ExecutorFactoryTestCase(unittest.TestCase):
         }
 
         self.routines = [RoutineTest]
-        self.factory = ExecutorFactory(self.routines, self.twitter_api)
+        self.factory = ExecutorFactory(
+            self.routines, self.twitter_keys, False)
 
     def test_create_default(self):
         executor = self.factory.create_default()
