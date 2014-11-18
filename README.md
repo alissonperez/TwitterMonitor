@@ -3,12 +3,11 @@ TwitterMonitor
 
 [![Build Status](https://travis-ci.org/alissonperez/TwitterMonitor.svg)](https://travis-ci.org/alissonperez/TwitterMonitor) [![Coverage Status](https://coveralls.io/repos/alissonperez/TwitterMonitor/badge.png?branch=master)](https://coveralls.io/r/alissonperez/TwitterMonitor?branch=master)
 
-TwitterMonitor é uma pequena biblioteca open source para criar rotinas de monitoramento de qualquer natureza usando o envio de mensagens (*direct messages* ou simplesmente *DM*) do *Twitter* (http://twitter.com).
+A small open source library to create monitoring routines of any nature using direct messages (DM) of **Twitter**.
 
-Para cada solicitação de envio de mensagem a biblioteca obterá **todos** os seguidores da conta configurada e enviará uma DM para cada um de forma automática.
+For each message send request, the library will take all the followers of configured account and send instantly a DM to each one.
 
-Abaixo segue um exemplo de uma rotina simples (classe **RoutineTest**) que envia a mensagem "A test message" para todos os seguidores da conta configurada no dicionário *twitter_keys* em um intervalo de no mínimo 10 minutos entre cada notificação.
-
+There is an example bellow of a simple routine (RoutineTest class) that sends "A test message" to all of the followers of configured account in the dictionary *twitter_keys* in a minimum interval of 10 minutes between each notification.
 
 ```python
 from twitter_monitor import core
