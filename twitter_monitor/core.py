@@ -156,11 +156,6 @@ class Notifier(common.loggable):
             return
 
         for follower in self._get_followers():
-            if follower.screen_name != "alissonperez":
-                self.logger.info("Skipping user '{}'".format(
-                    follower.screen_name))
-                continue
-
             self.logger.info("Sending message to \"{}\": \"{}\"".format(
                 follower.screen_name, message))
 
