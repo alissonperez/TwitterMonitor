@@ -49,7 +49,7 @@ class ExecutorFactory(common.loggable):
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
 
-        logger = logging.getLogger("twitter_monitor")
+        logger = logging.getLogger("")
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
 
