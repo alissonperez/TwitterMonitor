@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 from twitter_monitor.common import version
 import os
 
@@ -17,8 +17,7 @@ setup(
     version=version,
     author="Alisson R. Perez",
     author_email="alissonperez@gmail.com",
-    # @todo - Update it with our PyPI package page
-    url="https://pypi.python.org/pypi",
+    url="https://github.com/alissonperez/TwitterMonitor",
     packages=packages,
     classifiers=[
         "Programming Language :: Python",
