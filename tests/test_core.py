@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-from twitter_monitor.core import Notifier, Routine
-from mock import MagicMock, Mock
+from twitter_monitor.core import Notifier, Routine, Executor, ExecutorFactory
+from mock import MagicMock, Mock, call
 import unittest
 import datetime
 
@@ -10,6 +10,7 @@ def create_twitter_api_mock():
     """
     Create a mocked twitter api to use with tests
     """
+
     class Follower:
         def __init__(self, screen_name, id):
             self.screen_name = screen_name
@@ -20,6 +21,17 @@ def create_twitter_api_mock():
     api.followers.return_value = [Follower("alissonperez", 42)]
 
     return api
+
+
+class ExecutorTestCase(unittest.TestCase):
+
+    def test_run(self):
+        notifier = Mock(name="NotifierTest")
+        e = Executor(notifier, [RoutineTest])
+
+        self.assertTrue(e.run())
+
+        notifier.send.assert_called_once_with('Rout. Test: Test message')
 
 
 class NotifierTestCase(unittest.TestCase):
@@ -61,8 +73,6 @@ class RoutineTest(Routine):
     name = u"Routine Test"
     short_name = u"Rout. Test"
 
-    interval = 10    # minutes
-
     def _execute(self):
         self.notify("Test message")
         return True
@@ -72,14 +82,19 @@ class RoutineTestCase(unittest.TestCase):
 
     def setUp(self):
         self.notifier = create_notifier_mock()
-        self.routine = RoutineTest(self.notifier)
+        self.routine = RoutineTest(self.notifier, {})
+        self.routine.clear_last_execution()
+
+        self.test_message = "{}: {}".format(
+            self.routine.short_name, "Test message")
 
     def test_run(self):
         self.assertTrue(self.routine.run(), "Run method should return true")
 
-        message = "{}: {}".format(self.routine.short_name, "Test message")
+        self.notifier.send.assert_called_once_with(self.test_message)
 
-        self.notifier.send.assert_called_once_with(message)
+    def test_uid(self):
+        self.assertEquals("4229e3f836bc692f6112211fb711abbd", self.routine.uid)
 
     def test_last_execution(self):
         self.routine.run()
@@ -103,3 +118,36 @@ class RoutineTestCase(unittest.TestCase):
 
         self.routine.clear_last_execution()
         self.assertIsNone(self.routine.last_execution)
+
+    def test_execution_interval(self):
+        self.routine.interval_minutes = 10
+
+        self.routine.run()
+        self.routine.run()
+        self.notifier.send.assert_called_once_with(self.test_message)
+
+    def test_execution_interval_is_none(self):
+        self.routine.run()
+        self.routine.run()
+
+        calls = [call(self.test_message), call(self.test_message)]
+        self.assertEquals(calls, self.notifier.send.call_args_list)
+
+
+class ExecutorFactoryTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.twitter_keys = {
+            "consumer_key": "",
+            "consumer_secret": "",
+            "access_token_key": "",
+            "access_token_secret": "",
+        }
+
+        self.routines = [RoutineTest]
+        self.factory = ExecutorFactory(
+            self.routines, self.twitter_keys, False)
+
+    def test_create_default(self):
+        executor = self.factory.create_default()
+        self.assertIsInstance(executor, Executor)
