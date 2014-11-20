@@ -1,10 +1,5 @@
-.. highlight:: python
-
 About
-==========================================
-
-.. toctree::
-   :maxdepth: 2
+=====
 
 .. image:: https://travis-ci.org/alissonperez/TwitterMonitor.svg?branch=develop
  :target: https://travis-ci.org/alissonperez/TwitterMonitor :alt:Tests status
@@ -54,12 +49,3 @@ There is an example below of a simple routine (RoutineTest class) that sends "A 
     ]
 
     core.ExecutorFactory(routines, twitter_keys).create_default().run()
-
-
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
-

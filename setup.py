@@ -13,7 +13,7 @@ for dirpath, dirnames, filenames in os.walk("twitter_monitor"):
 packages = set(packages)
 
 long_description = ""
-with file("docs/index.rst") as f:
+with file("docs/about.rst") as f:
     long_description = f.read()
 
 setup(
