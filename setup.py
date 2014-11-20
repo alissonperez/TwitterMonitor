@@ -12,6 +12,10 @@ for dirpath, dirnames, filenames in os.walk("twitter_monitor"):
 
 packages = set(packages)
 
+long_description = ""
+with file("docs/index.rst") as f:
+    long_description = f.read()
+
 setup(
     name="TwitterMonitor",
     version=version,
@@ -37,9 +41,5 @@ setup(
         "tweepy>=2.3",
     ],
     description="Small library to create monitoring routines with Twitter DM",
-    long_description=("A small open source library to create monitoring "
-                      "routines of any nature using direct messages (DM) of "
-                      "Twitter. For each message send request, the library "
-                      "will take all the followers of configured account "
-                      "and send instantly a DM to each one.")
+    long_description=long_description
 )
