@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class ExecutorFactory(common.loggable):
     """
-    Factory to create an executor.
+    Factory responsable to create an Executor instance.
     """
 
     def __init__(self, routines,
@@ -26,6 +26,10 @@ class ExecutorFactory(common.loggable):
         self.setup_default_logger = setup_default_logger
 
     def create_default(self):
+        """
+        Create a default Executor and setup a default logger.
+        """
+
         self._setup_logger()
         self.logger.debug("Creating a default Executor")
 
@@ -40,6 +44,7 @@ class ExecutorFactory(common.loggable):
         """
         Setup module logger to
         """
+
         if not self.setup_default_logger:
             return
 
@@ -88,6 +93,17 @@ class ExecutorFactory(common.loggable):
 class Executor(common.loggable):
     """
     Responsable to run routines
+    This class should receive an instance of Notifier class
+    and an array of routines.
+
+
+    :param notifier: An instance of :class:`twitter_monitor.core.Notifier`
+    :param routines: A list of :class:`twitter_monitor.core.Routine`
+        subclasses (**not instances**)
+    :param key_value_store: A dictionary like storage.
+        It is used to store info about last
+        executions (like last execution time).
+        It is usual to use a simple key store like *anydbm*.
     """
 
     def __init__(self, notifier, routines, key_value_store={}):
@@ -97,6 +113,11 @@ class Executor(common.loggable):
         self._routines_instances = None
 
     def run(self):
+        """
+        Execute all routines. It returns True if all routines are
+        executed with success.
+        """
+
         success = True
 
         try:
@@ -145,6 +166,10 @@ class Notifier(common.loggable):
         self._followers = None
 
     def send(self, message):
+        """
+        Send a message to all destinations
+        """
+
         self.logger.debug("Message to send: \"{}\"".format(message))
 
         # Casting message
@@ -175,13 +200,13 @@ class Routine(common.loggable):
 
     __metaclass__ = ABCMeta
 
-    name = None  # Routine full name
+    name = None  #: Routine full name
 
-    short_name = None  # Routine short name (it'll be used in message)
+    short_name = None  #: Routine short name (it'll be used in message)
 
-    interval_minutes = None  # Interval to execute routine
+    interval_minutes = None  #: Interval (in minutes) to execute routine
 
-    _file_last_execution = None  # Cache of last execution file content
+    _file_last_execution = None  #: Cache of last execution file content
 
     def __init__(self, notifier, key_value_store={}):
         self.notifier = notifier
@@ -269,8 +294,9 @@ class Routine(common.loggable):
     @property
     def uid(self):
         """
-        It returns the routine unique id
+        Routine unique id (md5 format)
         """
+
         name = u"{} {} {}".format(
             self.__class__.__name__,
             self.name.encode("ascii", "ignore"),
@@ -282,6 +308,10 @@ class Routine(common.loggable):
         return m.hexdigest()
 
     def notify(self, message):
+        """
+        Send the message
+        """
+
         message = str(message)
 
         if len(message.strip()) == 0:
