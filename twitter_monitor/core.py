@@ -16,7 +16,19 @@ logger = logging.getLogger(__name__)
 
 class ExecutorFactory(common.loggable):
     """
-    Factory responsable to create an Executor instance.
+    Factory responsible to create
+    an :class:`twitter_monitor.core.Executor` instance.
+
+    :param routines: A list of :class:`twitter_monitor.core.Routine`
+        subclasses (**not instances**)
+    :param twitter_keys: A dictionary with api twitter keys. It must have these
+        keys (you can manage all of them on https://apps.twitter.com/).
+
+        - consumer_key
+        - consumer_secret
+        - access_token_key
+        - access_token_secret
+    :param setup_default_logger: If True (default) it'll setup the root logger.
     """
 
     def __init__(self, routines,
@@ -42,7 +54,7 @@ class ExecutorFactory(common.loggable):
 
     def _setup_logger(self):
         """
-        Setup module logger to
+        Setup module logger to show processing messages.
         """
 
         if not self.setup_default_logger:
@@ -92,10 +104,9 @@ class ExecutorFactory(common.loggable):
 
 class Executor(common.loggable):
     """
-    Responsable to run routines
-    This class should receive an instance of Notifier class
+    Responsible to run routines. This class must receive
+    an instance of :class:`twitter_monitor.core.Notifier` class
     and an array of routines.
-
 
     :param notifier: An instance of :class:`twitter_monitor.core.Notifier`
     :param routines: A list of :class:`twitter_monitor.core.Routine`
@@ -142,6 +153,10 @@ class Executor(common.loggable):
         return success
 
     def routines_instances(self):
+        """
+        Instantiate and return all routines instances.
+        """
+
         if self._routines_instances is not None:
             return self._routines_instances
 
@@ -157,6 +172,8 @@ class Executor(common.loggable):
 class Notifier(common.loggable):
     """
     It sends a message to destinations (followers) with twitter API.
+
+    :param api: An API instance (for now, we are using Tweepy)
     """
 
     def __init__(self, api):
@@ -168,6 +185,8 @@ class Notifier(common.loggable):
     def send(self, message):
         """
         Send a message to all destinations
+
+        :param message: A message to send to all followers.
         """
 
         self.logger.debug("Message to send: \"{}\"".format(message))
@@ -196,6 +215,12 @@ class Notifier(common.loggable):
 class Routine(common.loggable):
     """
     Routine representation
+
+    :param notifier: An instance of :class:`twitter_monitor.core.Notifier`
+    :param key_value_store: A dictionary like storage.
+        It is used to store info about last
+        executions (like last execution time).
+        It is usual to use a simple key store like *anydbm*.
     """
 
     __metaclass__ = ABCMeta
