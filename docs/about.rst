@@ -14,6 +14,8 @@ TwitterMonitor is a A small open source library to create monitoring routines of
 
 For each notification request, the library will take all the followers of the configured account and instantly send a DM to each one.
 
+Please, send us a feedback: arp-pp@outlook.com.br
+
 Code example
 ------------
 
