@@ -10,11 +10,11 @@ About
 .. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=latest
  :target: https://readthedocs.org/projects/twittermonitor/?badge=latest :alt: Documentation Status
 
-TwitterMonitor is a A small open source library to create monitoring routines of any nature using **Twitter direct messages (DM)**.
+TwitterMonitor is a small open source library to create monitoring routines of any nature using **Twitter direct messages (DM)**.
 
 For each notification request, the library will take all the followers of the configured account and instantly send a DM to each one.
 
-Please, send us a feedback: arp-pp@outlook.com.br
+Please, send me a feedback: arp-pp@outlook.com.br
 
 Code example
 ------------
