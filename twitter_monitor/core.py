@@ -43,7 +43,7 @@ class ExecutorFactory(common.loggable):
         """
 
         self._setup_logger()
-        self.logger.debug("Creating a default Executor")
+        self.logger.debug(u"Creating a default Executor")
 
         notifier = self._create_notifier(self._create_twitter_api())
 
@@ -61,7 +61,7 @@ class ExecutorFactory(common.loggable):
             return
 
         formatter = logging.Formatter(
-            '%(asctime)s - %(levelname)s - %(message)s')
+            u'%(asctime)s - %(levelname)s - %(message)s')
 
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
@@ -71,14 +71,14 @@ class ExecutorFactory(common.loggable):
         logger.setLevel(logging.DEBUG)
 
     def _create_twitter_api(self):
-        self.logger.debug("Creating a twitter api")
+        self.logger.debug(u"Creating a twitter api")
 
         ta = self.twitter_keys
 
-        self.logger.debug("Consumer_key: " + ta["consumer_key"])
-        self.logger.debug("Consumer_secret: " + ta["consumer_secret"])
-        self.logger.debug("Access_token_key: " + ta["access_token_key"])
-        self.logger.debug("Access_token_secret: " + ta["access_token_secret"])
+        self.logger.debug(u"Consumer_key: " + ta["consumer_key"])
+        self.logger.debug(u"Consumer_secret: " + ta["consumer_secret"])
+        self.logger.debug(u"Access_token_key: " + ta["access_token_key"])
+        self.logger.debug(u"Access_token_secret: " + ta["access_token_secret"])
 
         auth = tweepy.OAuthHandler(
             ta['consumer_key'], ta['consumer_secret'])
@@ -147,7 +147,7 @@ class Executor(common.loggable):
                     and callable(getattr(self.key_value_store, "close"))):
                     self.key_value_store.close()
 
-            self.logger.error("Error: " + e.message)
+            self.logger.error("Error: " + str(e))
             success = False
 
         return success
@@ -186,21 +186,21 @@ class Notifier(common.loggable):
         """
         Send a message to all destinations
 
-        :param message: A message to send to all followers.
+        :param message: A message to send to all followers. **USE UNICODE**
         """
 
-        self.logger.debug("Message to send: \"{}\"".format(message))
+        if not isinstance(message, unicode):
+            message = unicode(message, errors="ignore")
 
-        # Casting message
-        message = str(message)
+        self.logger.debug(u"Message to send: \"{}\"".format(message))
 
         if len(message.strip()) == 0:
             # @todo - Change this to exception
-            self.logger.warn("Empty message")
+            self.logger.warn(u"Empty message")
             return
 
         for follower in self._get_followers():
-            self.logger.info("Sending message to \"{}\": \"{}\"".format(
+            self.logger.info(u"Sending message to \"{}\": \"{}\"".format(
                 follower.screen_name, message))
 
             self._api.send_direct_message(user_id=follower.id, text=message)
@@ -225,9 +225,9 @@ class Routine(common.loggable):
 
     __metaclass__ = ABCMeta
 
-    name = None  #: Routine full name
+    name = None  #: Routine full name. **ALWAYS USE UNICODE**
 
-    short_name = None  #: Routine short name (it'll be used in message)
+    short_name = None  #: Routine short name (it'll be used in the message). **ALWAYS USE UNICODE**
 
     interval_minutes = None  #: Interval (in minutes) to execute routine
 
@@ -249,7 +249,7 @@ class Routine(common.loggable):
         """
 
         if self._skip_execution():
-            self.logger.info("Skipping execution")
+            self.logger.info(u"Skipping execution")
             return True
 
         if self._execute():
@@ -267,7 +267,7 @@ class Routine(common.loggable):
         diff = datetime.datetime.now() - self.last_execution
 
         if diff < timedelta_compare:
-            message = ("Interval not reached. Elapsed {} minutes")
+            message = u"Interval not reached. Elapsed {} minutes"
             self.logger.info(message.format(diff.seconds/60))
             return True
 
@@ -278,6 +278,9 @@ class Routine(common.loggable):
         """
         Put your code here in your subclasses.
         Must be implemented by subclasses.
+
+        Use self.notify(u"Some message") to send a message to recepients.
+        **IMPORTANT: Always use UNICODE messages**
         """
 
         return NotImplemented
@@ -295,7 +298,7 @@ class Routine(common.loggable):
         Returns a datetime object with last execution of routine
         """
 
-        self.logger.debug("Finding last execution time")
+        self.logger.debug(u"Finding last execution time")
 
         try:
             if self.uid in self.key_value_store:
@@ -303,7 +306,7 @@ class Routine(common.loggable):
                 return datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S.%f")
         except Exception, e:
             self.logger.debug(
-                "Exception - Method/property 'last_execution': " + e.message)
+                "Exception - Method/property 'last_execution': " + str(e))
 
         return None
 
@@ -323,12 +326,10 @@ class Routine(common.loggable):
         """
 
         name = u"{} {} {}".format(
-            self.__class__.__name__,
-            self.name.encode("ascii", "ignore"),
-            self.short_name.encode("ascii", "ignore"))
+            self.__class__.__name__, self.name, self.short_name)
 
         m = hashlib.md5()
-        m.update(name)
+        m.update(name.encode("ascii", errors="ignore"))
 
         return m.hexdigest()
 
@@ -337,10 +338,11 @@ class Routine(common.loggable):
         Send the message
         """
 
-        message = str(message)
+        if not isinstance(message, unicode):
+            message = unicode(message)
 
         if len(message.strip()) == 0:
-            self.logger.debug("Empty message")
+            self.logger.debug(u"Empty message")
             return
 
         new_message = u"{}: {}".format(
