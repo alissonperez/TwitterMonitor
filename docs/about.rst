@@ -19,7 +19,7 @@ Please, send me a feedback: arp-pp@outlook.com.br
 Code example
 ------------
 
-There is an example below of a simple routine (RoutineTest class) that sends "A test message" to every account followers of the account configured in the dictionary *twitter_keys* with a minimum interval of 10 minutes between each notification::
+There is an example below of a simple routine (RoutineTest class) that sends "A test message" to every account followers configured in the dictionary *twitter_keys* with a minimum interval of 10 minutes between each notification::
 
     from twitter_monitor import core
 
