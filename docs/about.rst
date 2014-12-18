@@ -10,16 +10,16 @@ About
 .. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=latest
  :target: https://readthedocs.org/projects/twittermonitor/?badge=latest :alt: Documentation Status
 
-***WARNING: This is a deprecated version to support python 2.* version.***
-
-TwitterMonitor is a A small open source library to create monitoring routines of any nature using **Twitter direct messages (DM)**.
+TwitterMonitor is a small open source library that creates any kind of monitoring routines using **Twitter direct messages (DM)**.
 
 For each notification request, the library will take all the followers of the configured account and instantly send a DM to each one.
+
+Please, send me a feedback: arp-pp@outlook.com.br
 
 Code example
 ------------
 
-There is an example below of a simple routine (RoutineTest class) that sends "A test message" to all of the followers of the account configured in the dictionary *twitter_keys* with a minimum interval of 10 minutes between each notification::
+There is an example below of a simple routine (RoutineTest class) that sends "A test message" to every account followers configured in the dictionary *twitter_keys* with a minimum interval of 10 minutes between each notification::
 
     from twitter_monitor import core
 
@@ -27,14 +27,14 @@ There is an example below of a simple routine (RoutineTest class) that sends "A 
     # A simple routine example
     class RoutineTest(core.Routine):
 
-        name = "Rotina Test 1"
-        short_name = "RT1"
+        name = u"Test Routine 1"  # Routine full name. ALWAYS USE UNICODE
+        short_name = u"RT1"       # Routine short name (it'll be used in message). ALWAYS USE UNICODE
 
-        interval_minutes = 10  # You can put a execution interval in minutes
+        interval_minutes = 10     # You can put a execution interval in minutes
 
         def _execute(self):
-            # Put your logic here
-            self.notify("A test message...")
+            # Put your logic here and use self.notify (bellow) to send messages. ALWAYS USE UNICODE MESSAGES
+            self.notify(u"A test message...")
 
 
     # Manage your keys and tokens on https://apps.twitter.com/
