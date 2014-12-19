@@ -10,7 +10,7 @@ About
 .. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=latest
  :target: https://readthedocs.org/projects/twittermonitor/?badge=latest :alt: Documentation Status
 
-***WARNING: This is a deprecated version to support python 2.x version.***
+***WARNING: This is a deprecated version to support python 2.x. For python 3.3 (>=) see 1.x (>=) version of this lib***
 
 TwitterMonitor is a small open source library that creates any kind of monitoring routines using **Twitter direct messages (DM)**.
 
