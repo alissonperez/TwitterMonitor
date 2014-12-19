@@ -9,5 +9,5 @@ install:
   - pip3.3 install python-coveralls
 
 # command to run tests
-script: coverage run run_tests.py
+script: coverage-3.3 run --branch run_tests.py
 after_success: coveralls

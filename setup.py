@@ -28,8 +28,8 @@ setup(
     packages=packages,
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Development Status :: 2 - Pre-Alpha",
+        "Programming Language :: Python :: 3.3",
+        "Development Status :: 3 - Alpha",
         "Operating System :: MacOS",
         "Operating System :: Unix",
         "Environment :: Console",
