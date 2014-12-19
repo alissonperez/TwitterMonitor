@@ -10,6 +10,8 @@ About
 .. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=1.x.x-py3.x
  :target: https://readthedocs.org/projects/twittermonitor/?badge=1.x.x-py3.x :alt: Documentation Status
 
+**WARNING: This is a python 3.3 (>=) version. For python 2.x, see 0.x version of this lib.**
+
 TwitterMonitor is a small open source library that creates any kind of monitoring routines using **Twitter direct messages (DM)**.
 
 For each notification request, the library will take all the followers of the configured account and instantly send a DM to each one.
