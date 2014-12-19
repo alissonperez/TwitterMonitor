@@ -187,7 +187,7 @@ class Notifier(common.loggable):
         """
         Send a message to all destinations
 
-        :param message: A message to send to all followers. **USE UNICODE**
+        :param message: A message to send to all followers.
         """
 
         if not isinstance(message, str):
@@ -224,9 +224,9 @@ class Routine(common.loggable, metaclass=ABCMeta):
         It is usual to use a simple key store like *anydbm*.
     """
 
-    name = None  #: Routine full name. **ALWAYS USE UNICODE**
+    name = None  #: Routine full name.
 
-    short_name = None  #: Routine short name (it'll be used in the message). **ALWAYS USE UNICODE**
+    short_name = None  #: Routine short name (it'll be used in the message).
 
     interval_minutes = None  #: Interval (in minutes) to execute routine
 
@@ -278,8 +278,7 @@ class Routine(common.loggable, metaclass=ABCMeta):
         Put your code here in your subclasses.
         Must be implemented by subclasses.
 
-        Use self.notify(u"Some message") to send a message to recepients.
-        **IMPORTANT: Always use UNICODE messages**
+        Use self.notify('Some message') to send a message to recepients.
         """
 
         return NotImplemented

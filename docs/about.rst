@@ -1,14 +1,14 @@
 About
 =====
 
-.. image:: https://travis-ci.org/alissonperez/TwitterMonitor.svg?branch=develop
+.. image:: https://travis-ci.org/alissonperez/TwitterMonitor.svg?branch=1.x.x-py3.x
  :target: https://travis-ci.org/alissonperez/TwitterMonitor :alt:Tests status
 
-.. image:: https://coveralls.io/repos/alissonperez/TwitterMonitor/badge.png?branch=master
- :target: https://coveralls.io/r/alissonperez/TwitterMonitor?branch=master :alt:Code coverage status
+.. image:: https://coveralls.io/repos/alissonperez/TwitterMonitor/badge.png?branch=1.x.x-py3.x
+ :target: https://coveralls.io/r/alissonperez/TwitterMonitor?branch=1.x.x-py3.x :alt:Code coverage status
 
-.. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=latest
- :target: https://readthedocs.org/projects/twittermonitor/?badge=latest :alt: Documentation Status
+.. image:: https://readthedocs.org/projects/twittermonitor/badge/?version=1.x.x-py3.x
+ :target: https://readthedocs.org/projects/twittermonitor/?badge=1.x.x-py3.x :alt: Documentation Status
 
 TwitterMonitor is a small open source library that creates any kind of monitoring routines using **Twitter direct messages (DM)**.
 
