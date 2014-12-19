@@ -16,7 +16,7 @@ long_description = ""
 try:
     with file("docs/about.rst") as f:
         long_description = f.read()
-except Exception, e:
+except Exception as e:
     pass
 
 setup(
@@ -28,7 +28,7 @@ setup(
     packages=packages,
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
         "Development Status :: 2 - Pre-Alpha",
         "Operating System :: MacOS",
         "Operating System :: Unix",

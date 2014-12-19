@@ -2,13 +2,14 @@
 
 from abc import ABCMeta
 from abc import abstractmethod
-import common
+from . import common
 import datetime
 import hashlib
 import logging
 import tweepy
-import anydbm
+import dbm
 import tempfile
+import collections
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ class ExecutorFactory(common.loggable):
         """
 
         self._setup_logger()
-        self.logger.debug(u"Creating a default Executor")
+        self.logger.debug("Creating a default Executor")
 
         notifier = self._create_notifier(self._create_twitter_api())
 
@@ -61,7 +62,7 @@ class ExecutorFactory(common.loggable):
             return
 
         formatter = logging.Formatter(
-            u'%(asctime)s - %(levelname)s - %(message)s')
+            '%(asctime)s - %(levelname)s - %(message)s')
 
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
@@ -71,14 +72,14 @@ class ExecutorFactory(common.loggable):
         logger.setLevel(logging.DEBUG)
 
     def _create_twitter_api(self):
-        self.logger.debug(u"Creating a twitter api")
+        self.logger.debug("Creating a twitter api")
 
         ta = self.twitter_keys
 
-        self.logger.debug(u"Consumer_key: " + ta["consumer_key"])
-        self.logger.debug(u"Consumer_secret: " + ta["consumer_secret"])
-        self.logger.debug(u"Access_token_key: " + ta["access_token_key"])
-        self.logger.debug(u"Access_token_secret: " + ta["access_token_secret"])
+        self.logger.debug("Consumer_key: " + ta["consumer_key"])
+        self.logger.debug("Consumer_secret: " + ta["consumer_secret"])
+        self.logger.debug("Access_token_key: " + ta["access_token_key"])
+        self.logger.debug("Access_token_secret: " + ta["access_token_secret"])
 
         auth = tweepy.OAuthHandler(
             ta['consumer_key'], ta['consumer_secret'])
@@ -95,8 +96,8 @@ class ExecutorFactory(common.loggable):
         try:
             name = ".twitter-monitor-info"
             filename = "{}/{}".format(tempfile.gettempdir(), name)
-            return anydbm.open(filename, "c")
-        except Exception, e:
+            return dbm.open(filename, "c")
+        except Exception as e:
             pass
 
         return None
@@ -133,18 +134,18 @@ class Executor(common.loggable):
 
         try:
             for rt in self.routines_instances():
-                self.logger.info(u"Running \"{}\"".format(unicode(rt)))
+                self.logger.info("Running \"{}\"".format(str(rt)))
 
                 if not rt.run():
                     self.logger.error(
-                        u"Error on running routine \"{}\"".format(unicode(rt)))
+                        "Error on running routine \"{}\"".format(str(rt)))
 
                     success = False
 
-                self.logger.info(u"Finished \"{}\"".format(unicode(rt)))
-        except Exception, e:
+                self.logger.info("Finished \"{}\"".format(str(rt)))
+        except Exception as e:
             if (hasattr(self.key_value_store, "close")
-                    and callable(getattr(self.key_value_store, "close"))):
+                    and isinstance(getattr(self.key_value_store, "close"), collections.Callable)):
                     self.key_value_store.close()
 
             self.logger.error("Error: " + str(e))
@@ -189,18 +190,18 @@ class Notifier(common.loggable):
         :param message: A message to send to all followers. **USE UNICODE**
         """
 
-        if not isinstance(message, unicode):
-            message = unicode(message, errors="ignore")
+        if not isinstance(message, str):
+            message = str(message, errors="ignore")
 
-        self.logger.debug(u"Message to send: \"{}\"".format(message))
+        self.logger.debug("Message to send: \"{}\"".format(message))
 
         if len(message.strip()) == 0:
             # @todo - Change this to exception
-            self.logger.warn(u"Empty message")
+            self.logger.warn("Empty message")
             return
 
         for follower in self._get_followers():
-            self.logger.info(u"Sending message to \"{}\": \"{}\"".format(
+            self.logger.info("Sending message to \"{}\": \"{}\"".format(
                 follower.screen_name, message))
 
             self._api.send_direct_message(user_id=follower.id, text=message)
@@ -212,7 +213,7 @@ class Notifier(common.loggable):
         return self._followers
 
 
-class Routine(common.loggable):
+class Routine(common.loggable, metaclass=ABCMeta):
     """
     Routine representation
 
@@ -222,8 +223,6 @@ class Routine(common.loggable):
         executions (like last execution time).
         It is usual to use a simple key store like *anydbm*.
     """
-
-    __metaclass__ = ABCMeta
 
     name = None  #: Routine full name. **ALWAYS USE UNICODE**
 
@@ -249,7 +248,7 @@ class Routine(common.loggable):
         """
 
         if self._skip_execution():
-            self.logger.info(u"Skipping execution")
+            self.logger.info("Skipping execution")
             return True
 
         if self._execute():
@@ -267,7 +266,7 @@ class Routine(common.loggable):
         diff = datetime.datetime.now() - self.last_execution
 
         if diff < timedelta_compare:
-            message = u"Interval not reached. Elapsed {} minutes"
+            message = "Interval not reached. Elapsed {} minutes"
             self.logger.info(message.format(diff.seconds/60))
             return True
 
@@ -298,13 +297,13 @@ class Routine(common.loggable):
         Returns a datetime object with last execution of routine
         """
 
-        self.logger.debug(u"Finding last execution time")
+        self.logger.debug("Finding last execution time")
 
         try:
             if self.uid in self.key_value_store:
                 val = self.key_value_store[self.uid]
                 return datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S.%f")
-        except Exception, e:
+        except Exception as e:
             self.logger.debug(
                 "Exception - Method/property 'last_execution': " + str(e))
 
@@ -325,7 +324,7 @@ class Routine(common.loggable):
         Routine unique id (md5 format)
         """
 
-        name = u"{} {} {}".format(
+        name = "{} {} {}".format(
             self.__class__.__name__, self.name, self.short_name)
 
         m = hashlib.md5()
@@ -338,17 +337,17 @@ class Routine(common.loggable):
         Send the message
         """
 
-        if not isinstance(message, unicode):
-            message = unicode(message)
+        if not isinstance(message, str):
+            message = str(message)
 
         if len(message.strip()) == 0:
-            self.logger.debug(u"Empty message")
+            self.logger.debug("Empty message")
             return
 
-        new_message = u"{}: {}".format(
+        new_message = "{}: {}".format(
             self.short_name, message)
 
         self.notifier.send(new_message)
 
     def __str__(self):
-        return u"Routine '{}'".format(self.name)
+        return "Routine '{}'".format(self.name)
