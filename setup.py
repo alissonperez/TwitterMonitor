@@ -16,7 +16,7 @@ long_description = ""
 try:
     with file("docs/about.rst") as f:
         long_description = f.read()
-except Exception, e:
+except Exception as e:
     pass
 
 setup(
@@ -28,8 +28,8 @@ setup(
     packages=packages,
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
-        "Development Status :: 2 - Pre-Alpha",
+        "Programming Language :: Python :: 3.3",
+        "Development Status :: 3 - Alpha",
         "Operating System :: MacOS",
         "Operating System :: Unix",
         "Environment :: Console",
@@ -43,6 +43,6 @@ setup(
     install_requires=[
         "tweepy>=2.3",
     ],
-    description="Small library to create monitoring routines with Twitter DM",
+    description="Small library to create monitoring routines with Twitter DM. (Python >= 3.3)",
     long_description=long_description
 )

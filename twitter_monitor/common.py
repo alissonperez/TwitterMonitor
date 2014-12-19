@@ -3,7 +3,7 @@
 import logging
 
 # Application's version
-version = "0.1.4"
+version = "1.0.0"
 
 
 class loggable(object):

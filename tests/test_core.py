@@ -25,11 +25,11 @@ def create_twitter_api_mock():
 
 class RoutineTest(Routine):
 
-    name = u"Routine Tést"      # Keep accent to test unicode conversion
-    short_name = u"Rout. Tést"  # Keep accent to test unicode conversion
+    name = "Routine Tést"      # Keep accent to test unicode conversion
+    short_name = "Rout. Tést"  # Keep accent to test unicode conversion
 
     def _execute(self):
-        self.notify(u"Tést message")  # Keep accent to test unicode conversion
+        self.notify("Tést message")  # Keep accent to test unicode conversion
         return True
 
 
@@ -41,7 +41,7 @@ class ExecutorTestCase(unittest.TestCase):
 
         self.assertTrue(e.run())
 
-        notifier.send.assert_called_once_with(u"Rout. Tést: Tést message")
+        notifier.send.assert_called_once_with("Rout. Tést: Tést message")
 
 
 class NotifierTestCase(unittest.TestCase):
@@ -85,8 +85,8 @@ class RoutineTestCase(unittest.TestCase):
         self.routine = RoutineTest(self.notifier, {})
         self.routine.clear_last_execution()
 
-        self.test_message = u"{}: {}".format(
-            self.routine.short_name, u"Tést message")
+        self.test_message = "{}: {}".format(
+            self.routine.short_name, "Tést message")
 
     def test_run(self):
         self.assertTrue(self.routine.run(), "Run method should return true")
@@ -94,7 +94,7 @@ class RoutineTestCase(unittest.TestCase):
 
     def test_str_conversion(self):
         self.assertEquals(
-            u"Routine 'Routine Tést'", unicode(self.routine))
+            "Routine 'Routine Tést'", str(self.routine))
 
     def test_uid(self):
         self.assertEquals("d10a6995cf53612e9a4725a8ae8d4e3a", self.routine.uid)
