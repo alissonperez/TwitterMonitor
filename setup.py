@@ -43,6 +43,6 @@ setup(
     install_requires=[
         "tweepy>=2.3",
     ],
-    description="Small library to create monitoring routines with Twitter DM",
+    description="Small library to create monitoring routines with Twitter DM. (Python 2.x)",
     long_description=long_description
 )
