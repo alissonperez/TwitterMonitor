@@ -27,14 +27,14 @@ There is an example below of a simple routine (RoutineTest class) that sends "A 
     # A simple routine example
     class RoutineTest(core.Routine):
 
-        name = u"Test Routine 1"  # Routine full name. ALWAYS USE UNICODE
-        short_name = u"RT1"       # Routine short name (it'll be used in message). ALWAYS USE UNICODE
+        name = "Test Routine 1"  # Routine full name.
+        short_name = "RT1"       # Routine short name (it'll be used in message).
 
         interval_minutes = 10     # You can put a execution interval in minutes
 
         def _execute(self):
-            # Put your logic here and use self.notify (bellow) to send messages. ALWAYS USE UNICODE MESSAGES
-            self.notify(u"A test message...")
+            # Put your logic here and use self.notify (bellow) to send messages.
+            self.notify("A test message...")
 
 
     # Manage your keys and tokens on https://apps.twitter.com/
