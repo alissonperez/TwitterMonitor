@@ -38,6 +38,8 @@ There is an example below of a simple routine (RoutineTest class) that sends "A 
             # Put your logic here and use self.notify (bellow) to send messages.
             self.notify("A test message...")
 
+            return True
+
 
     # Manage your keys and tokens on https://apps.twitter.com/
     twitter_keys = {
