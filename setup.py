@@ -1,6 +1,7 @@
 from setuptools import setup
-from twitter_monitor.common import version
+from twitter_monitor.common import version, Tc
 import os
+import sys
 
 # Compile a list of packages available
 packages = []
@@ -19,30 +20,38 @@ try:
 except Exception as e:
     pass
 
-setup(
-    name="TwitterMonitor",
-    version=version,
-    author="Alisson R. Perez",
-    author_email="alissonperez@gmail.com",
-    url="https://github.com/alissonperez/TwitterMonitor",
-    packages=packages,
-    classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.3",
-        "Development Status :: 3 - Alpha",
-        "Operating System :: MacOS",
-        "Operating System :: Unix",
-        "Environment :: Console",
-        "Intended Audience :: Developers",
-        "Intended Audience :: System Administrators",
-        "Intended Audience :: Information Technology",
-        "Topic :: Software Development :: Libraries",
-        "Topic :: System :: Monitoring",
-        "Topic :: Utilities",
-    ],
-    install_requires=[
-        "tweepy>=2.3",
-    ],
-    description="Small library to create monitoring routines with Twitter DM. (Python >= 3.3)",
-    long_description=long_description
-)
+if sys.version_info < (3,):
+    print(Tc("ERROR: Python 2.x requires TwitterMonitor '0.x' version.").underline)
+    print(Tc("If you are using pip, try:").fail)
+    print("")
+    print(Tc("sudo pip install 'twittermonitor<1'").warning)
+    raise SystemExit(1)
+else:
+    setup(
+        name="TwitterMonitor",
+        version=version,
+        author="Alisson R. Perez",
+        author_email="alissonperez@gmail.com",
+        url="https://github.com/alissonperez/TwitterMonitor",
+        packages=packages,
+        classifiers=[
+            "Programming Language :: Python",
+            "Programming Language :: Python :: 3.3",
+            "Development Status :: 3 - Alpha",
+            "Operating System :: MacOS",
+            "Operating System :: Unix",
+            "Environment :: Console",
+            "Intended Audience :: Developers",
+            "Intended Audience :: System Administrators",
+            "Intended Audience :: Information Technology",
+            "Topic :: Software Development :: Libraries",
+            "Topic :: System :: Monitoring",
+            "Topic :: Utilities",
+        ],
+        install_requires=[
+            "tweepy>=2.3",
+        ],
+        description="Small library to create monitoring routines with "
+        "Twitter DM. (Python >= 3.3)",
+        long_description=long_description
+    )
